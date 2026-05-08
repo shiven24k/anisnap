@@ -128,6 +128,7 @@ function useCreatePost() {
 	const createPost = usePostStore((state) => state.createPost);
 	const addPost = useUserProfileStore((state) => state.addPost);
 	const userProfile = useUserProfileStore((state) => state.userProfile);
+	const setAuthUser = useAuthStore((state) => state.setUser);
 	const { pathname } = useLocation();
 
 	const handleCreatePost = async (selectedFile, caption) => {
@@ -173,6 +174,10 @@ function useCreatePost() {
 			if (userError) throw userError;
 
 			const createdPost = mapPost(updatedPost);
+
+			const updatedAuthUser = { ...authUser, posts: nextUserPosts };
+			setAuthUser(updatedAuthUser);
+			localStorage.setItem("user-info", JSON.stringify(updatedAuthUser));
 
 			if (userProfile?.uid === authUser.uid) createPost(createdPost);
 			if (pathname !== "/" && userProfile?.uid === authUser.uid) addPost(createdPost);

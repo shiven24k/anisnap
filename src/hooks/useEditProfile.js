@@ -22,7 +22,10 @@ const useEditProfile = () => {
 		let URL = "";
 		try {
 			if (selectedFile) {
-				URL = await uploadDataUrl("profile-pictures", `${authUser.uid}/profile`, selectedFile);
+				console.log("selectedFile type:", typeof selectedFile);
+				console.log("selectedFile preview:", selectedFile?.substring(0, 50));
+				const timestamp = Date.now();
+				URL = await uploadDataUrl("profile-pictures", `${authUser.uid}/profile_${timestamp}`, selectedFile);
 			}
 
 			const updatedUser = {
@@ -35,6 +38,8 @@ const useEditProfile = () => {
 
 			const { error } = await supabase.from("profiles").update(toProfileRow(updatedUser)).eq("uid", authUser.uid);
 			if (error) throw error;
+			const { data: check } = await supabase.from("profiles").select("profile_pic_url").eq("uid", authUser.uid).single();
+			console.log("DB profile_pic_url after update:", check);
 			localStorage.setItem("user-info", JSON.stringify(updatedUser));
 			setAuthUser(updatedUser);
 			setUserProfile(updatedUser);

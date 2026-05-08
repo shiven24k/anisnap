@@ -22,6 +22,7 @@ const ProfilePost = ({ post }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const deletePost = usePostStore(state => state.deletePost);
     const decrementPostsCount = useUserProfileStore((state) => state.deletePost);
+    const setAuthUser = useAuthStore((state) => state.setUser);
 
     const handleDeletePost = async () => {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
@@ -32,11 +33,16 @@ const ProfilePost = ({ post }) => {
             const { error: deleteError } = await supabase.from("posts").delete().eq("id", post.id);
             if (deleteError) throw deleteError;
 
+            const nextUserPosts = authUser.posts.filter((id) => id !== post.id);
             const { error: profileError } = await supabase
                 .from("profiles")
-                .update({ posts: authUser.posts.filter((id) => id !== post.id) })
+                .update({ posts: nextUserPosts })
                 .eq("uid", authUser.uid);
             if (profileError) throw profileError;
+
+            const updatedAuthUser = { ...authUser, posts: nextUserPosts };
+            setAuthUser(updatedAuthUser);
+            localStorage.setItem("user-info", JSON.stringify(updatedAuthUser));
 
             deletePost(post.id);
             decrementPostsCount(post.id);
@@ -158,9 +164,9 @@ const ProfilePost = ({ post }) => {
                                     {/* caption */}
                                     {post.caption && <Caption post={post} />}
                                     {/* comment */}
-                                    {post.comments.map((comment => (
-                                        <Comment key={comment.id} comment={comment} />
-                                    )))}
+                                    {post.comments.map((comment, idx) => (
+                                        <Comment key={comment.id || idx} comment={comment} />
+                                    ))}
 
 
 

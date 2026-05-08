@@ -51,7 +51,7 @@ const CommentsModal = ({ isOpen, onClose, post }) => {
 						ref={commentsContainerRef}
 					>
 						{post.comments.map((comment, idx) => (
-							<Comment key={idx} comment={comment} />
+							<Comment key={comment.id || idx} comment={comment} />
 						))}
 					</Flex>
 					<form onSubmit={handleSubmitComment} style={{ marginTop: "2rem" }}>
