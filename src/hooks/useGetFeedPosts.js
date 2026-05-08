@@ -3,8 +3,8 @@ import usePostStore from "../store/postStore";
 import useAuthStore from "../store/authStore";
 import useShowToast from "./useShowToast";
 import useUserProfileStore from "../store/userProfileStore";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
+import { supabase } from "../supabase/supabaseClient";
+import { mapPost } from "../supabase/mappers";
 
 const useGetFeedPosts = () => {
 	const [isLoading, setIsLoading] = useState(true);
@@ -21,17 +21,15 @@ const useGetFeedPosts = () => {
 				setPosts([]);
 				return;
 			}
-			const q = query(collection(firestore, "posts"), where("createdBy", "in", authUser.following));
 			try {
-				const querySnapshot = await getDocs(q);
-				const feedPosts = [];
+				const { data, error } = await supabase
+					.from("posts")
+					.select("*")
+					.in("created_by", authUser.following)
+					.order("created_at", { ascending: false });
+				if (error) throw error;
 
-				querySnapshot.forEach((doc) => {
-					feedPosts.push({ id: doc.id, ...doc.data() });
-				});
-
-				feedPosts.sort((a, b) => b.createdAt - a.createdAt);
-				setPosts(feedPosts);
+				setPosts(data.map(mapPost));
 			} catch (error) {
 				showToast("Error", error.message, "error");
 			} finally {

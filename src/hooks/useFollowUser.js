@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "../store/authStore";
 import useUserProfileStore from "../store/userProfileStore";
 import useShowToast from "./useShowToast";
-import { firestore } from "../firebase/firebase";
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { supabase } from "../supabase/supabaseClient";
 
 const useFollowUser = (userId) => {
 	const [isUpdating, setIsUpdating] = useState(false);
@@ -16,15 +15,24 @@ const useFollowUser = (userId) => {
 	const handleFollowUser = async () => {
 		setIsUpdating(true);
 		try {
-			const currentUserRef = doc(firestore, "users", authUser.uid);
-			const userToFollowOrUnfollorRef = doc(firestore, "users", userId);
-			await updateDoc(currentUserRef, {
-				following: isFollowing ? arrayRemove(userId) : arrayUnion(userId),
-			});
+			const nextFollowing = isFollowing
+				? authUser.following.filter((uid) => uid !== userId)
+				: [...new Set([...authUser.following, userId])];
+			const nextFollowers = isFollowing
+				? (userProfile?.followers || []).filter((uid) => uid !== authUser.uid)
+				: [...new Set([...(userProfile?.followers || []), authUser.uid])];
 
-			await updateDoc(userToFollowOrUnfollorRef, {
-				followers: isFollowing ? arrayRemove(authUser.uid) : arrayUnion(authUser.uid),
-			});
+			const { error: currentUserError } = await supabase
+				.from("profiles")
+				.update({ following: nextFollowing })
+				.eq("uid", authUser.uid);
+			if (currentUserError) throw currentUserError;
+
+			const { error: targetUserError } = await supabase
+				.from("profiles")
+				.update({ followers: nextFollowers })
+				.eq("uid", userId);
+			if (targetUserError) throw targetUserError;
 
 			if (isFollowing) {
 				// unfollow

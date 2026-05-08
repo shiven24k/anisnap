@@ -1,11 +1,12 @@
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { auth, firestore } from "../firebase/firebase";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
+import { supabase } from "../supabase/supabaseClient";
+import { mapProfile, toProfileRow } from "../supabase/mappers";
 
 const useSignUpWithEmailAndPassword = () => {
-	const [createUserWithEmailAndPassword, , loading, error] = useCreateUserWithEmailAndPassword(auth);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
 	const showToast = useShowToast();
 	const loginUser = useAuthStore((state) => state.login);
 
@@ -15,25 +16,20 @@ const useSignUpWithEmailAndPassword = () => {
 			return;
 		}
 
-		const usersRef = collection(firestore, "users");
-
-		const q = query(usersRef, where("username", "==", inputs.username));
-		const querySnapshot = await getDocs(q);
-
-		if (!querySnapshot.empty) {
-			showToast("Error", "Username already exists", "error");
-			return;
-		}
-
 		try {
-			const newUser = await createUserWithEmailAndPassword(inputs.email, inputs.password);
-			if (!newUser && error) {
-				showToast("Error", error.message, "error");
-				return;
-			}
-			if (newUser) {
+			setLoading(true);
+			setError(null);
+
+			// ✅ Step 1: Sign up first (no DB query before auth)
+			const { data: authData, error: signUpError } = await supabase.auth.signUp({
+				email: inputs.email,
+				password: inputs.password,
+			});
+			if (signUpError) throw signUpError;
+
+			if (authData.user) {
 				const userDoc = {
-					uid: newUser.user.uid,
+					uid: authData.user.id,
 					email: inputs.email,
 					username: inputs.username,
 					fullname: inputs.fullname,
@@ -44,12 +40,32 @@ const useSignUpWithEmailAndPassword = () => {
 					posts: [],
 					createdAt: Date.now(),
 				};
-				await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
-				localStorage.setItem("user-info", JSON.stringify(userDoc));
-				loginUser(userDoc);
+
+				// ✅ Step 2: Insert profile after auth
+				const { data: profile, error: profileError } = await supabase
+					.from("profiles")
+					.insert(toProfileRow(userDoc))
+					.select()
+					.single();
+
+				// ✅ Step 3: Catch duplicate username via unique constraint
+				if (profileError) {
+					if (profileError.code === "23505") {
+						showToast("Error", "Username already taken", "error");
+						return;
+					}
+					throw profileError;
+				}
+
+				const mappedProfile = mapProfile(profile);
+				localStorage.setItem("user-info", JSON.stringify(mappedProfile));
+				loginUser(mappedProfile);
 			}
 		} catch (error) {
+			setError(error);
 			showToast("Error", error.message, "error");
+		} finally {
+			setLoading(false);
 		}
 	};
 

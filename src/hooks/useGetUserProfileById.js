@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useShowToast from "./useShowToast";
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
+import { supabase } from "../supabase/supabaseClient";
+import { mapProfile } from "../supabase/mappers";
 
 const useGetUserProfileById = (userId) => {
 	const [isLoading, setIsLoading] = useState(true);
@@ -14,10 +14,9 @@ const useGetUserProfileById = (userId) => {
 			setIsLoading(true);
 			setUserProfile(null);
 			try {
-				const userRef = await getDoc(doc(firestore, "users", userId));
-				if (userRef.exists()) {
-					setUserProfile(userRef.data());
-				}
+				const { data, error } = await supabase.from("profiles").select("*").eq("uid", userId).maybeSingle();
+				if (error) throw error;
+				setUserProfile(mapProfile(data));
 			} catch (error) {
 				showToast("Error", error.message, "error");
 			} finally {

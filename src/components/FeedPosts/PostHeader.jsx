@@ -5,7 +5,6 @@ import {
   Button, 
   HStack 
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
 import useFollowUser from "../../hooks/useFollowUser";
 import { timeAgo } from "../../utils/timeAgo";
 

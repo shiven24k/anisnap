@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, VStack } from "@chakra-ui/react"
+import { Box, Grid, VStack } from "@chakra-ui/react"
 import FeedPosts from "../../components/FeedPosts/FeedPosts"
 import SuggestedUsers from "../../SuggestedUsers/SuggestedUsers"
 

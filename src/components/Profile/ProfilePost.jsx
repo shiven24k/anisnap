@@ -1,5 +1,5 @@
 import { Flex, GridItem, Text, Image, useDisclosure, Modal, ModalContent, ModalOverlay, ModalCloseButton, ModalBody, Avatar, Divider, VStack, Button } from '@chakra-ui/react'
-import {useState} from 'react'
+import { useState } from 'react'
 import { AiFillHeart } from 'react-icons/ai'
 import { FaComment } from 'react-icons/fa'
 import { MdDelete } from 'react-icons/md'
@@ -8,39 +8,42 @@ import PostFooter from "../FeedPosts/PostFooter"
 import useUserProfileStore from '../../store/userProfileStore'
 import useAuthStore from '../../store/authStore'
 import useShowToast from '../../hooks/useShowToast'
-import { firestore, storage } from '../../firebase/firebase'
-import { deleteObject,ref } from 'firebase/storage'
-import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import usePostStore from '../../store/postStore'
 import Caption from '../Comment/Caption'
+import { supabase } from '../../supabase/supabaseClient'
+import { removeStorageFile } from '../../supabase/storage'
 
 
 const ProfilePost = ({ post }) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const userProfile = useUserProfileStore ((state) => state.userProfile);
-    const authUser = useAuthStore ((state)=>state.user);
+    const userProfile = useUserProfileStore((state) => state.userProfile);
+    const authUser = useAuthStore((state) => state.user);
     const showToast = useShowToast();
-    const [isDeleting , setIsDeleting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const deletePost = usePostStore(state => state.deletePost);
     const decrementPostsCount = useUserProfileStore((state) => state.deletePost);
 
-    const handleDeletePost = async () =>{
-        if(!window.confirm("Are you sure you want to delete this post?")) return;
-        if(isDeleting) return;
-        try{
-            const imageRef = ref(storage, `posts/${post.id}`);
-            await deleteObject(imageRef)
-            const userRef = doc(firestore,"users",authUser.uid)
-            await deleteDoc(doc(firestore,"posts",post.id))
-            await updateDoc(userRef,{
-                posts: arrayRemove(post.id)
-            })
+    const handleDeletePost = async () => {
+        if (!window.confirm("Are you sure you want to delete this post?")) return;
+        if (isDeleting) return;
+        try {
+            setIsDeleting(true);
+            await removeStorageFile("post-image", `${post.id}/image`);
+            const { error: deleteError } = await supabase.from("posts").delete().eq("id", post.id);
+            if (deleteError) throw deleteError;
+
+            const { error: profileError } = await supabase
+                .from("profiles")
+                .update({ posts: authUser.posts.filter((id) => id !== post.id) })
+                .eq("uid", authUser.uid);
+            if (profileError) throw profileError;
+
             deletePost(post.id);
             decrementPostsCount(post.id);
-            showToast("Success","Post deleted successfully","success");
-        }catch(error){
-            showToast("Error",error.message,"error");
-        }finally{
+            showToast("Success", "Post deleted successfully", "success");
+        } catch (error) {
+            showToast("Error", error.message, "error");
+        } finally {
             setIsDeleting(false);
         }
     }
@@ -106,8 +109,8 @@ const ProfilePost = ({ post }) => {
                     <ModalCloseButton />
                     <ModalBody bg={"black"} pb={5}>
                         <Flex gap="4" w={{ base: "90%", sm: "70%", md: "full" }} mx={"auto"}
-                        maxH={"90vh"}
-                        minH={"50vh"}>
+                            maxH={"90vh"}
+                            minH={"50vh"}>
                             <Flex
                                 borderRadius={4}
                                 overflow={"hidden"}
@@ -134,39 +137,39 @@ const ProfilePost = ({ post }) => {
 
 
                                     {authUser?.uid === userProfile.uid && (
-                                    
-                                    <Button 
-                                    size={"sm"}
-                                    bg={"transparent"}
-                                    _hover={{ bg: "whiteAlpha.300",color: "red.600" }}
-                                    borderRadius={4} 
-                                    p={1}
-                                    onClick={handleDeletePost}>
-                                        <MdDelete size={20} cursor="pointer" />
-                                    </Button>
-                                    
-                                    ) }
+
+                                        <Button
+                                            size={"sm"}
+                                            bg={"transparent"}
+                                            _hover={{ bg: "whiteAlpha.300", color: "red.600" }}
+                                            borderRadius={4}
+                                            p={1}
+                                            onClick={handleDeletePost}>
+                                            <MdDelete size={20} cursor="pointer" />
+                                        </Button>
+
+                                    )}
 
                                 </Flex>
 
                                 <Divider my={4} bg={"gray.500"} />
 
                                 <VStack w="full" alignItems={"start"} maxH={"350px"} overflowY={"auto"}>
-                                {/* caption */}
-                                {post.caption && <Caption post={post}/>}
-                                {/* comment */}
-                                 {post.comments.map((comment => (
-                                    <Comment key={comment.id} comment={comment}/>
-                                 )))}
-                               
-                                
-                               
+                                    {/* caption */}
+                                    {post.caption && <Caption post={post} />}
+                                    {/* comment */}
+                                    {post.comments.map((comment => (
+                                        <Comment key={comment.id} comment={comment} />
+                                    )))}
+
+
+
                                 </VStack>
                                 <Divider my={4} bg={"gray.500"} />
 
-                                <PostFooter isProfilePage={"true"} post={post}/>
+                                <PostFooter isProfilePage={"true"} post={post} />
 
-                                
+
 
                             </Flex>
                         </Flex>

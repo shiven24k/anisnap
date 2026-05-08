@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Button, Flex, Link, Tooltip } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { Logo, MobileLogo } from "../../assets/constants";

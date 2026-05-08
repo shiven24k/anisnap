@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
+import { supabase } from "../supabase/supabaseClient";
+import { mapProfile } from "../supabase/mappers";
 
 const useSearchUser = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -12,14 +12,11 @@ const useSearchUser = () => {
 		setIsLoading(true);
 		setUser(null);
 		try {
-			const q = query(collection(firestore, "users"), where("username", "==", username));
+			const { data, error } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
+			if (error) throw error;
+			if (!data) return showToast("Error", "User not found", "error");
 
-			const querySnapshot = await getDocs(q);
-			if (querySnapshot.empty) return showToast("Error", "User not found", "error");
-
-			querySnapshot.forEach((doc) => {
-				setUser(doc.data());
-			}); 
+			setUser(mapProfile(data));
 		} catch (error) {
 			showToast("Error", error.message, "error");
 			setUser(null);

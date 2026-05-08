@@ -4,13 +4,11 @@ import HomePage from './pages/HomePage/HomePage'
 import AuthPage from './pages/AuthPage/AuthPage'
 import PageLayout from './Layouts/PageLayout/PageLayout'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
-import useAuthStore from './store/authStore'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { auth } from './firebase/firebase'
+import useSupabaseAuth from './hooks/useSupabaseAuth'
 
 function App() {
   
- const [authUser] = useAuthState(auth)
+ const { user: authUser } = useSupabaseAuth()
   return (
   <PageLayout>
    <Routes>

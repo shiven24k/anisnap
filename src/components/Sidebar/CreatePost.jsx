@@ -25,9 +25,9 @@ import useAuthStore from "../../store/authStore";
 import usePostStore from "../../store/postStore";
 import useUserProfileStore from "../../store/userProfileStore";
 import { useLocation } from "react-router-dom";
-import { addDoc, arrayUnion, collection, doc, updateDoc } from "firebase/firestore";
-import { firestore, storage } from "../../firebase/firebase";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { supabase } from "../../supabase/supabaseClient";
+import { mapPost, toPostRow } from "../../supabase/mappers";
+import { uploadDataUrl } from "../../supabase/storage";
 
 const CreatePost = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -131,7 +131,13 @@ function useCreatePost() {
 	const { pathname } = useLocation();
 
 	const handleCreatePost = async (selectedFile, caption) => {
+		console.log("authUser:", authUser);
+		console.log("authUser.uid:", authUser?.uid);
 		if (isLoading) return;
+		if (!authUser) {
+			showToast("Error", "You must be logged in", "error");
+			return;
+		}
 		if (!selectedFile) throw new Error("Please select an image");
 		setIsLoading(true);
 		const newPost = {
@@ -143,21 +149,33 @@ function useCreatePost() {
 		};
 
 		try {
-			const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
-			const userDocRef = doc(firestore, "users", authUser.uid);
-			const imageRef = ref(storage, `posts/${postDocRef.id}`);
+			const { data: insertedPost, error: insertError } = await supabase
+				.from("posts")
+				.insert(toPostRow(newPost))
+				.select()
+				.single();
+			if (insertError) throw insertError;
 
-			await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
-			await uploadString(imageRef, selectedFile, "data_url");
-			const downloadURL = await getDownloadURL(imageRef);
+			const downloadURL = await uploadDataUrl("post-image", `${insertedPost.id}/image`, selectedFile);
+			const { data: updatedPost, error: imageError } = await supabase
+				.from("posts")
+				.update({ image_url: downloadURL })
+				.eq("id", insertedPost.id)
+				.select()
+				.single();
+			if (imageError) throw imageError;
 
-			await updateDoc(postDocRef, { imageURL: downloadURL });
+			const nextUserPosts = [...new Set([insertedPost.id, ...(authUser.posts || [])])];
+			const { error: userError } = await supabase
+				.from("profiles")
+				.update({ posts: nextUserPosts })
+				.eq("uid", authUser.uid);
+			if (userError) throw userError;
 
-			newPost.imageURL = downloadURL;
+			const createdPost = mapPost(updatedPost);
 
-			if (userProfile.uid === authUser.uid) createPost({ ...newPost, id: postDocRef.id });
-
-			if (pathname !== "/" && userProfile.uid === authUser.uid) addPost({ ...newPost, id: postDocRef.id });
+			if (userProfile?.uid === authUser.uid) createPost(createdPost);
+			if (pathname !== "/" && userProfile?.uid === authUser.uid) addPost(createdPost);
 
 			showToast("Success", "Post created successfully", "success");
 		} catch (error) {

@@ -1,11 +1,11 @@
-import React,{useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import useShowToast from './useShowToast';
-import { collection, getDocs ,query, where } from 'firebase/firestore';
-import { firestore } from '../firebase/firebase';
 import useUserProfileStore from "../store/userProfileStore"
+import { supabase } from '../supabase/supabaseClient';
+import { mapProfile } from '../supabase/mappers';
 
 const useGetUserProfileByUserName = (username) => {
-  const [isLoading,setIsLoading] = React.useState(true)
+  const [isLoading,setIsLoading] = useState(true)
   const showToast = useShowToast();
 //   const {userProfile, setUserProfile} = useUserProfileStore()
    const {userProfile, setUserProfile} = useUserProfileStore()
@@ -14,17 +14,9 @@ const useGetUserProfileByUserName = (username) => {
     const getUserProfile = async() => {
         setIsLoading(true)
         try{
-           const q = query(collection(firestore,"users"),where("username","==",username))
-           const querySnapshot = await getDocs(q);
-
-           if(querySnapshot.empty) return setUserProfile(null);
-           let userDoc;
-           querySnapshot.forEach((doc) => {
-            userDoc = doc.data();
-            
-           });
-           setUserProfile(userDoc);
-           console.log(userDoc);
+           const { data, error } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
+           if (error) throw error;
+           setUserProfile(mapProfile(data));
 
         }
         catch(error){

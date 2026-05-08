@@ -1,9 +1,8 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
 import usePostStore from "../store/postStore";
+import { supabase } from "../supabase/supabaseClient";
 
 const usePostComment = () => {
 	const [isCommenting, setIsCommenting] = useState(false);
@@ -22,9 +21,18 @@ const usePostComment = () => {
 			postId,
 		};
 		try {
-			await updateDoc(doc(firestore, "posts", postId), {
-				comments: arrayUnion(newComment),
-			});
+			const { data: post, error: postError } = await supabase
+				.from("posts")
+				.select("comments")
+				.eq("id", postId)
+				.single();
+			if (postError) throw postError;
+
+			const { error } = await supabase
+				.from("posts")
+				.update({ comments: [...(post.comments || []), newComment] })
+				.eq("id", postId);
+			if (error) throw error;
 			addComment(postId, newComment);
 		} catch (error) {
 			showToast("Error", error.message, "error");

@@ -1,12 +1,13 @@
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useState } from "react";
 import useShowToast from "./useShowToast";
-import { auth, firestore } from "../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
 import useAuthStore from "../store/authStore";
+import { supabase } from "../supabase/supabaseClient";
+import { mapProfile } from "../supabase/mappers";
 
 const useLogin = () => {
 	const showToast = useShowToast();
-	const [signInWithEmailAndPassword, , loading, error] = useSignInWithEmailAndPassword(auth);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
 	const loginUser = useAuthStore((state) => state.login);
 
 	const login = async (inputs) => {
@@ -14,16 +15,31 @@ const useLogin = () => {
 			return showToast("Error", "Please fill all the fields", "error");
 		}
 		try {
-			const userCred = await signInWithEmailAndPassword(inputs.email, inputs.password);
+			setLoading(true);
+			setError(null);
+			const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
+				email: inputs.email,
+				password: inputs.password,
+			});
+			if (loginError) throw loginError;
 
-			if (userCred) {
-				const docRef = doc(firestore, "users", userCred.user.uid);
-				const docSnap = await getDoc(docRef);
-				localStorage.setItem("user-info", JSON.stringify(docSnap.data()));
-				loginUser(docSnap.data());
+			if (authData.user) {
+				const { data: profile, error: profileError } = await supabase
+					.from("profiles")
+					.select("*")
+					.eq("uid", authData.user.id)
+					.single();
+				if (profileError) throw profileError;
+
+				const mappedProfile = mapProfile(profile);
+				localStorage.setItem("user-info", JSON.stringify(mappedProfile));
+				loginUser(mappedProfile);
 			}
 		} catch (error) {
+			setError(error);
 			showToast("Error", error.message, "error");
+		} finally {
+			setLoading(false);
 		}
 	};
 
