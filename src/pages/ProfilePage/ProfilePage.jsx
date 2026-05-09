@@ -1,173 +1,84 @@
-import { Container, Flex, Link, Skeleton, SkeletonCircle, Text, VStack } from '@chakra-ui/react';
+import { Container, Flex, Link, Skeleton, SkeletonCircle, Text, VStack, Box, useColorModeValue, Grid } from '@chakra-ui/react';
 import ProfileHeader from '../../components/Profile/ProfileHeader';
-import ProfileTabs from '../../components/Profile/ProfileTabs';
-import ProfilePosts from '../../components/Profile/ProfilePosts';
+import ProfilePost from '../../components/Profile/ProfilePost';
 import useGetUserProfileByUserName from '../../hooks/useGetUserProfileByUserName';
+import useGetUserPosts from '../../hooks/useGetUserPosts';
 import { useParams } from 'react-router-dom';
 import { Link as RouterLink } from "react-router-dom";
-import { extendTheme, ChakraProvider } from '@chakra-ui/react';
-
-// Custom theme
-const theme = extendTheme({
-  config: {
-    initialColorMode: 'dark',
-    useSystemColorMode: false,
-  },
-  styles: {
-    global: {
-      body: {
-        bg: '#272F3E',
-        color: '#E0E0E0'
-      }
-    }
-  },
-  colors: {
-    brand: {
-      50: '#E6E6E6',
-      100: '#CCCCCC',
-      200: '#B3B3B3',
-      300: '#999999',
-      400: '#808080',
-      500: '#272F3E', // primary color
-      600: '#1E252F',
-      700: '#151A23',
-      800: '#0C1016',
-      900: '#030509'
-    }
-  },
-  components: {
-    Container: {
-      baseStyle: {
-        bg: '#272F3E',
-      }
-    },
-    Flex: {
-      baseStyle: {
-        bg: '#272F3E',
-      }
-    },
-    Skeleton: {
-      baseStyle: {
-        startColor: '#3A4454',
-        endColor: '#4A5568'
-      }
-    }
-  }
-});
 
 const ProfilePage = () => {
   const { username } = useParams()
   const { isLoading, userProfile } = useGetUserProfileByUserName(username)
+  const { isLoading: postsLoading, posts } = useGetUserPosts()
+  
+  const bgColor = useColorModeValue('#F5F5F5', '#0A0A12')
+  const cardBg = useColorModeValue('white', 'rgba(255,255,255,0.05)')
+  const textColor = useColorModeValue('#1A1A2E', 'white')
+  const subTextColor = useColorModeValue('gray.600', 'whiteAlpha.600')
+  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100')
   
   const userNotFound = !isLoading && !userProfile
-  if (userNotFound) return <UserNotFound />
+  if (userNotFound) return <UserNotFound bgColor={bgColor} textColor={textColor} subTextColor={subTextColor} />
 
   return (
-    <ChakraProvider theme={theme}>
-      <Container maxW="container.lg" py={5} bg="#272F3E">
-        <Flex 
-          py={10} 
-          px={4} 
-          pl={{base:4,md:10}} 
-          w={"full"} 
-          mx={"auto"} 
-          flexDirection={"column"} 
-          bg="#272F3E"
-        >
+    <Box minH="100vh" bg={bgColor} position="relative">
+      <Container maxW="container.lg" py={5}>
+        <Flex py={6} px={4} w={"full"} mx={"auto"} flexDirection={"column"} bg={cardBg} borderRadius="2xl" mt={4} mb={6}>
           {!isLoading && userProfile && <ProfileHeader />}
-          {isLoading && <ProfileHeaderSkeleton />}
+          {isLoading && <ProfileHeaderSkeleton textColor={textColor} />}
         </Flex>
-        <Flex
-          px={{base:2,sm:4}}
-          maxW={"full"}
-          mx={"auto"}
-          borderTop={"1px solid"}
-          borderColor={"whiteAlpha.300"}
-          direction={"column"}
-          bg="#272F3E"
-        >
-          <ProfileTabs />
-          <ProfilePosts />
-        </Flex>
+
+        <Box bg={cardBg} borderRadius="2xl" border="1px solid" borderColor={borderColor} p={4}>
+          <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4} px={2}>Posts</Text>
+          
+          {postsLoading ? (
+            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={2}>
+              {[0,1,2,3,4,5].map((i) => (
+                <Skeleton key={i} h="200px" borderRadius="lg" />
+              ))}
+            </Grid>
+          ) : posts.length > 0 ? (
+            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={2}>
+              {posts.map((post) => (
+                <ProfilePost key={post.id} post={post} />
+              ))}
+            </Grid>
+          ) : (
+            <Flex flexDir='column' textAlign={"center"} py={10}>
+              <Text fontSize="3xl" mb={2}>📷</Text>
+              <Text fontSize="lg" fontWeight="bold" color={textColor}>No Posts Yet</Text>
+              <Text color={subTextColor} fontSize="sm">Start sharing your anime journey!</Text>
+            </Flex>
+          )}
+        </Box>
       </Container>
-    </ChakraProvider>
+    </Box>
   )
 }
 
 export default ProfilePage
 
-const ProfileHeaderSkeleton = () => {
+const ProfileHeaderSkeleton = ({ textColor }) => {
   return (
-    <Flex
-      gap={{ base: 4, sm: 10 }}
-      py={10}
-      direction={{ base: "column", sm: "row" }}
-      justifyContent={"center"}
-      alignItems={"center"}
-      bg="#272F3E"
-    >
-      <SkeletonCircle 
-        size='24' 
-        startColor="#3A4454" 
-        endColor="#4A5568" 
-      />
-
-      <VStack 
-        alignItems={{ base: "center", sm: "flex-start" }} 
-        gap={2} 
-        mx={"auto"} 
-        flex={1}
-      >
-        <Skeleton 
-          height='12px' 
-          width='150px' 
-          startColor="#3A4454" 
-          endColor="#4A5568" 
-        />
-        <Skeleton 
-          height='12px' 
-          width='100px' 
-          startColor="#3A4454" 
-          endColor="#4A5568" 
-        />
+    <Flex gap={{ base: 4, sm: 10 }} py={10} direction={{ base: "column", sm: "row" }} justifyContent={"center"} alignItems={"center"}>
+      <SkeletonCircle size='24' border="3px solid" borderColor="red.500" />
+      <VStack alignItems={{ base: "center", sm: "flex-start" }} gap={2} mx={"auto"} flex={1}>
+        <Skeleton height='16px' width='150px' borderRadius="lg" />
+        <Skeleton height='12px' width='100px' borderRadius="lg" />
       </VStack>
     </Flex>
   );
 };
 
-const UserNotFound = () => {
+const UserNotFound = ({ bgColor, textColor, subTextColor }) => {
   return (
-    <ChakraProvider theme={theme}>
-      <Flex 
-        flexDir='column' 
-        textAlign={"center"} 
-        mx={"auto"} 
-        bg="#272F3E" 
-        minH="100vh" 
-        justifyContent="center" 
-        alignItems="center"
-      >
-        <Text 
-          fontSize={"2xl"} 
-          color="#E0E0E0" 
-          mb={4}
-        >
-          User Not Found
-        </Text>
-        <Link 
-          as={RouterLink} 
-          to={"/"} 
-          color={"blue.300"} 
-          w={"max-content"} 
-          mx={"auto"}
-          _hover={{
-            color: "blue.200",
-            textDecoration: "underline"
-          }}
-        > 
-          Go Home
-        </Link>
-      </Flex>
-    </ChakraProvider>
+    <Flex flexDir='column' textAlign={"center"} mx={"auto"} bg={bgColor} minH="100vh" justifyContent="center" alignItems="center">
+      <VStack spacing={6}>
+        <Text fontSize={"4xl"} fontWeight="bold" color={textColor}>404</Text>
+        <Text fontSize={"2xl"} color={textColor}>User Not Found</Text>
+        <Text color={subTextColor} maxW="300px">The user you're looking for doesn't exist.</Text>
+        <Link as={RouterLink} to={"/"} bg="#E53935" color="white" px={6} py={3} borderRadius="xl" fontWeight="bold" _hover={{ bg: '#C62828' }}>Go Home</Link>
+      </VStack>
+    </Flex>
   )
 }

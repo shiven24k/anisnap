@@ -3,13 +3,18 @@ import {
   Flex, 
   Text, 
   Button, 
-  HStack 
+  HStack,
+  useColorModeValue
 } from "@chakra-ui/react";
 import useFollowUser from "../../hooks/useFollowUser";
 import { timeAgo } from "../../utils/timeAgo";
 
 const PostHeader = ({ post, creatorProfile }) => {
   const { handleFollowUser, isFollowing, isUpdating } = useFollowUser(post.createdBy);
+
+  const textColor = useColorModeValue('#1A1A2E', 'white')
+  const subTextColor = useColorModeValue('gray.500', 'gray.400')
+  const borderColor = useColorModeValue('gray.300', 'gray.600')
 
   return (
     <Flex 
@@ -24,18 +29,18 @@ const PostHeader = ({ post, creatorProfile }) => {
           name={creatorProfile?.username}
           size="md"
           border="2px solid"
-          borderColor="gray.600"
+          borderColor="#E53935"
         />
         <Flex flexDirection="column">
           <Text 
             fontWeight="bold" 
-            color="white"
+            color={textColor}
             fontSize="md"
           >
             {creatorProfile?.username}
           </Text>
           <Text 
-            color="gray.400" 
+            color={subTextColor} 
             fontSize="xs"
           >
             {timeAgo(post.createdAt)}
@@ -46,7 +51,9 @@ const PostHeader = ({ post, creatorProfile }) => {
       <Button
         size="sm"
         variant="outline"
-        colorScheme="gray"
+        borderColor={useColorModeValue('gray.300', 'gray.600')}
+        color={textColor}
+        _hover={{ bg: useColorModeValue('gray.100', 'whiteAlpha.100') }}
         onClick={handleFollowUser}
         isLoading={isUpdating}
       >

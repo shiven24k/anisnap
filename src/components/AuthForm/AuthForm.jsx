@@ -1,4 +1,4 @@
-import { Box, Flex, Image, VStack, Text } from "@chakra-ui/react"
+import { Box, Flex, VStack, Text, Button, HStack } from "@chakra-ui/react"
 import { useState } from "react"
 import Login from "./Login"
 import Signup from "./Signup"
@@ -8,79 +8,47 @@ const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
 
     return (
-        <VStack spacing={6} w="full">
-            <Box 
-                border={"1px solid"} 
-                borderColor={"whiteAlpha.300"} 
-                borderRadius={8} 
-                p={6} 
-                w="full" 
-                boxShadow={"sm"}
-                bg="#023485"
-            >
-                <VStack spacing={5}>
-                    <Image 
-                        src='/logo.png' 
-                       
-                        cursor={"pointer"} 
-                        alt='Instagram' 
-                        objectFit="contain"
-                    />
-
-                    {isLogin ? <Login/> : <Signup/>}
-                    
-                    {/* OR Divider */}
-                    <Flex 
-                        align={"center"} 
-                        justifyContent={"center"} 
-                        my={3} 
-                        gap={4} 
-                        w={"full"}
-                    >
-                        <Box flex={2} h={"1px"} bg={"whiteAlpha.400"} />
-                        <Text 
-                            mx={1} 
-                            color={"white"} 
-                            fontWeight={"bold"}
-                        >
-                            OR
-                        </Text>  
-                        <Box flex={2} h={"1px"} bg={"whiteAlpha.400"} />
-                    </Flex>
-                    
-                    <GoogleAuth prefix={isLogin ? "Log in" : "Sign up"} />
-                </VStack>
+        <VStack spacing={5} w="full">
+            <Box w="full">
+                {isLogin ? <Login /> : <Signup />}
             </Box>
 
-            <Box 
-                border={"1px solid"} 
-                borderColor={"whiteAlpha.300"} 
-                borderRadius={8} 
-                p={4} 
-                w="full" 
-                boxShadow={"sm"}
-                bg="#023485"
-            >
-                <Flex 
-                    alignItems={"center"} 
-                    justifyContent={"center"}
+
+
+            <HStack w="full" align="center">
+                <Box flex={1} h="1px" bg="whiteAlpha.200" />
+                <Text
+                    mx={3}
+                    color="whiteAlpha.500"
+                    fontSize="sm"
+                    fontWeight="medium"
                 >
-                    <Text 
-                        mx={2} 
-                        fontSize={14} 
-                        color={"whiteAlpha.700"}
-                    >
-                        {isLogin ? "Don't have an account?" : "Already have an account?"}
-                    </Text>
-                    <Text 
-                        onClick={() => setIsLogin(!isLogin)} 
-                        color={"red.400"} 
-                        cursor={"pointer"} 
-                        fontWeight={"bold"}
-                    >
-                        {isLogin ? "Sign Up" : "Log in"}
-                    </Text>
-                </Flex>
+                    OR
+                </Text>
+                <Box flex={1} h="1px" bg="whiteAlpha.200" />
+            </HStack>
+
+            <GoogleAuth prefix={isLogin ? "Log in" : "Sign up"} />
+
+            <Box w="full" textAlign="center" pt={2}>
+                <Text
+                    fontSize="sm"
+                    color="whiteAlpha.600"
+                    display="inline"
+                >
+                    {isLogin ? "Don't have an account?" : "Already have an account?"}
+                </Text>
+                <Button
+                    variant="link"
+                    size="sm"
+                    color="red.400"
+                    fontWeight="bold"
+                    ml={1}
+                    onClick={() => setIsLogin(!isLogin)}
+                    _hover={{ color: "red.300" }}
+                >
+                    {isLogin ? "Sign Up" : "Log in"}
+                </Button>
             </Box>
         </VStack>
     )

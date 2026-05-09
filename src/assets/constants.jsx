@@ -1,22 +1,22 @@
 import weblogo from '../../public/logo.png';
 import mobologo from '../../public/nobglgo.png';
 export const Logo = () => (
-	
+
 	<img src={weblogo} height='29'
-	width='190' alt='desktop logo'></img>
+		width='190' alt='desktop logo'></img>
 );
 
 export const MobileLogo = () => (
-	
+
 	<img src={mobologo} height='64'
-	width='64' alt='mobile logo'></img>
+		width='64' alt='mobile logo'></img>
 );
 
 export const SearchLogo = () => (
 	<svg
 		aria-label='Search'
-		color='rgb(245, 245, 245)'
-		fill='rgb(245, 245, 245)'
+		color='#E53935'
+		fill='#E53935'
 		height='24'
 		role='img'
 		viewBox='0 0 24 24'
@@ -127,8 +127,8 @@ export const MessagesLogo = () => (
 export const NotificationsLogo = () => (
 	<svg
 		aria-label='Notifications'
-		color='rgb(245, 245, 245)'
-		fill='rgb(245, 245, 245)'
+		color='#E53935'
+		fill='#E53935'
 		height='24'
 		role='img'
 		viewBox='0 0 24 24'
@@ -156,8 +156,8 @@ export const UnlikeLogo = () => (
 export const CreatePostLogo = () => (
 	<svg
 		aria-label='New post'
-		color='rgb(245, 245, 245)'
-		fill='rgb(245, 245, 245)'
+		color='#E53935'
+		fill='#E53935'
 		height='24'
 		role='img'
 		viewBox='0 0 24 24'

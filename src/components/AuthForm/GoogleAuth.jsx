@@ -1,4 +1,4 @@
-import { Flex, Image, Spinner, Text } from '@chakra-ui/react'
+import { Button, Image, Spinner, HStack, Text, VStack } from '@chakra-ui/react'
 import { useState } from 'react';
 import useShowToast from '../../hooks/useShowToast';
 import { supabase } from '../../supabase/supabaseClient';
@@ -31,39 +31,25 @@ const GoogleAuth = ({ prefix }) => {
   }
 
   return (
-    <Flex 
-      alignItems={"center"} 
-      justifyContent={"center"} 
-      cursor={"pointer"}
+    <Button
+      variant="glass"
+      w="full"
+      h="44px"
       onClick={handleGoogleAuth}
-      bg="whiteAlpha.200"
-      p={2}
-      borderRadius={6}
-      border="1px solid"
-      borderColor="whiteAlpha.300"
-      transition="all 0.3s"
-      _hover={{
-        bg: "whiteAlpha.300",
-        transform: "scale(1.02)"
-      }}
+      isLoading={isLoading}
+      loadingText="Connecting..."
     >
-      {isLoading ? (
-        <Spinner size="sm" mr={2} />
-      ) : (
+      <HStack spacing={3}>
         <Image 
           src="/google.png" 
           w={5} 
           alt="Google Logo" 
-          mr={2}
         />
-      )}
-      <Text 
-        color={"white"} 
-        fontWeight={"semibold"}
-      >
-        {prefix} in with Google
-      </Text>
-    </Flex>
+        <Text fontWeight="medium">
+          Continue with Google
+        </Text>
+      </HStack>
+    </Button>
   )
 }
 

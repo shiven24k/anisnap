@@ -6,34 +6,76 @@ const ProfileTabs=()=> {
     <Flex 
       w={"full"}
       justifyContent={"center"}
-      gap={{base:4,sm:10}}
+      gap={{base:2,sm:8}}
       textTransform={"uppercase"}
-      fontWeight={"bold"}>
-      
-      <Flex borderTop={"1px solid white"} alignItems={"center"} p="3" gap={1} cursor={"pointer"}>
-        <Box fontSize={20}>
+      fontWeight={"bold"}
+    >
+      <Flex 
+        borderTop={"2px solid"} 
+        borderColor="brand.500"
+        alignItems={"center"} 
+        p={4} 
+        gap={2} 
+        cursor={"pointer"}
+        transition="all 0.3s"
+        _hover={{ bg: "whiteAlpha.50" }}
+      >
+        <Box 
+          fontSize={20} 
+          color="brand.400"
+        >
           <BsGrid3X3/>
         </Box>
-        <Text fontSize={20} display={{base:"none",sm:"block"}}>Posts</Text>
-      
+        <Text 
+          fontSize={{base:"xs",sm:"sm"}} 
+          display={{base:"none",sm:"block"}}
+          color="whiteAlpha.900"
+        >
+          Posts
+        </Text>
       </Flex>
 
-      <Flex alignItems={"center"} p="3" gap={1} cursor={"pointer"}>
-        <Box fontSize={20}>
+      <Flex 
+        alignItems={"center"} 
+        p={4} 
+        gap={2} 
+        cursor={"pointer"}
+        transition="all 0.3s"
+        _hover={{ bg: "whiteAlpha.50" }}
+        borderTop="2px solid transparent"
+      >
+        <Box fontSize={20} color="whiteAlpha.500">
           <BsBookmark/>
         </Box>
-        <Text fontSize={20} display={{base:"none",sm:"block"}}>Saved</Text>
-      
+        <Text 
+          fontSize={{base:"xs",sm:"sm"}} 
+          display={{base:"none",sm:"block"}}
+          color="whiteAlpha.500"
+        >
+          Saved
+        </Text>
       </Flex>
 
-      <Flex alignItems={"center"} p="3" gap={1} cursor={"pointer"}>
-        <Box fontSize={20}>
-          <BsSuitHeart fontWeight={"bold"}/>
+      <Flex 
+        alignItems={"center"} 
+        p={4} 
+        gap={2} 
+        cursor={"pointer"}
+        transition="all 0.3s"
+        _hover={{ bg: "whiteAlpha.50" }}
+        borderTop="2px solid transparent"
+      >
+        <Box fontSize={20} color="whiteAlpha.500">
+          <BsSuitHeart/>
         </Box>
-        <Text fontSize={20} display={{base:"none",sm:"block"}}>Tagged</Text>
-      
+        <Text 
+          fontSize={{base:"xs",sm:"sm"}} 
+          display={{base:"none",sm:"block"}}
+          color="whiteAlpha.500"
+        >
+          Tagged
+        </Text>
       </Flex>
-    
     </Flex>
   )
 }

@@ -1,4 +1,4 @@
-import { Flex, GridItem, Text, Image, useDisclosure, Modal, ModalContent, ModalOverlay, ModalCloseButton, ModalBody, Avatar, Divider, VStack, Button } from '@chakra-ui/react'
+import { Flex, GridItem, Text, Image, useDisclosure, Modal, ModalContent, ModalOverlay, ModalCloseButton, ModalBody, Avatar, Divider, VStack, Button, HStack, Box, useColorModeValue } from '@chakra-ui/react'
 import { useState } from 'react'
 import { AiFillHeart } from 'react-icons/ai'
 import { FaComment } from 'react-icons/fa'
@@ -57,14 +57,26 @@ const ProfilePost = ({ post }) => {
         <>
             <GridItem
                 cursor={"pointer"}
-                borderRadius={4}
+                borderRadius="xl"
                 overflow={"hidden"}
-                border={"1px solid"}
                 position={"relative"}
-                borderColor={"WhiteAlpha.300"}
                 aspectRatio={1 / 1}
                 onClick={onOpen}
+                transition="all 0.3s"
+                _hover={{
+                    transform: "scale(1.02)",
+                    boxShadow: "0 0 30px rgba(139, 92, 246, 0.3)",
+                }}
             >
+                <Box
+                    position="absolute"
+                    inset={0}
+                    bgGradient="linear(to-t, blackAlpha.600, transparent)"
+                    opacity={0}
+                    _groupHover={{ opacity: 1 }}
+                    transition="all 0.3s ease"
+                    zIndex={1}
+                />
 
                 <Flex
                     opacity={0}
@@ -74,115 +86,142 @@ const ProfilePost = ({ post }) => {
                     left={0}
                     right={0}
                     bottom={0}
-                    bg={"blackAlpha.700"}
+                    bg={"blackAlpha.600"}
                     transition={"all 0.3s ease"}
-                    zIndex={1}
+                    zIndex={2}
                     justifyContent={"center"}
+                    alignItems="center"
                 >
-
-                    <Flex alignItems={"center"} justifyContent={"center"} gap={50}>
-                        <Flex>
-                            <AiFillHeart size={20} />
-                            <Text fontWeight={"bold"} ml={2} >{post.likes.length}
+                    <HStack spacing={8}>
+                        <Flex alignItems={"center"} gap={2}>
+                            <Box color="pink.400">
+                                <AiFillHeart size={24} />
+                            </Box>
+                            <Text fontWeight={"bold"} color="white">
+                                {post.likes.length}
                             </Text>
                         </Flex>
 
-                        <Flex>
-                            <FaComment size={20} />
-                            <Text fontWeight={"bold"} ml={2} >{post.comments.length}
+                        <Flex alignItems={"center"} gap={2}>
+                            <Box color="blue.400">
+                                <FaComment size={20} />
+                            </Box>
+                            <Text fontWeight={"bold"} color="white">
+                                {post.comments.length}
                             </Text>
                         </Flex>
-
-                    </Flex>
-
-
-
-
-
-
-
-
+                    </HStack>
                 </Flex>
-                <Image src={post.imageURL} alt='profile post' w={"100%"} h={"100%"} objectFit={"cover"} />
+                
+                <Image 
+                    src={post.imageURL} 
+                    alt='profile post' 
+                    w={"100%"} 
+                    h={"100%"} 
+                    objectFit={"cover"} 
+                />
             </GridItem>
 
             <Modal isOpen={isOpen} onClose={onClose}
                 isCentered={true}
-                size={{ base: "3xl", md: "5xl" }}>
-                <ModalOverlay />
-                <ModalContent>
-
-                    <ModalCloseButton />
-                    <ModalBody bg={"black"} pb={5}>
-                        <Flex gap="4" w={{ base: "90%", sm: "70%", md: "full" }} mx={"auto"}
-                            maxH={"90vh"}
-                            minH={"50vh"}>
+                size={{ base: "full", md: "5xl" }}>
+                <ModalOverlay 
+                    bg="rgba(0, 0, 0, 0.8)"
+                    backdropFilter="blur(10px)"
+                />
+                <ModalContent 
+                    bg="anime.dark"
+                    borderRadius="2xl"
+                    border="1px solid"
+                    borderColor="whiteAlpha.100"
+                    className="glass-card"
+                    mx={2}
+                >
+                    <ModalCloseButton 
+                        bg="whiteAlpha.200"
+                        borderRadius="full"
+                        _hover={{ bg: "whiteAlpha.300" }}
+                    />
+                    <ModalBody p={0}>
+                        <Flex 
+                            gap={0} 
+                            w="full" 
+                            maxH={{ base: "80vh", md: "80vh" }}
+                            direction={{ base: "column", md: "row" }}
+                        >
                             <Flex
-                                borderRadius={4}
-                                overflow={"hidden"}
-                                border={"1px solid"}
-                                borderColor={"whiteAlpha.300"}
                                 flex={1.5}
                                 justifyContent={"center"}
                                 alignItems={"center"}
+                                bg="black"
+                                borderRadius={{ base: "none", md: "2xl 0 0 2xl" }}
+                                overflow="hidden"
                             >
-                                <Image src={post.imageURL} alt='profile post' />
-
+                                <Image 
+                                    src={post.imageURL} 
+                                    alt='profile post' 
+                                    maxH={{ base: "50vh", md: "80vh" }}
+                                    w="full"
+                                    objectFit="contain"
+                                />
                             </Flex>
-                            <Flex flex={1} flexDir={"column"} px={10} display={{ base: "none", md: "flex" }} >
-
-                                <Flex alignItems={"center"} justifyContent={"space-between"}>
-
-
-                                    <Flex alignItems={"center"} gap={4}>
-                                        <Avatar src={userProfile.profilePicURL} size={"sm"} name='shiven ' />
-                                        <Text fontWeight={"bold"} fontSize={12} >
-                                            {userProfile.username}</Text>
-                                    </Flex>
-
-
+                            
+                            <Flex 
+                                flex={1} 
+                                flexDir={"column"} 
+                                p={6}
+                                display={{ base: "none", md: "flex" }}
+                            >
+                                <Flex alignItems={"center"} justifyContent={"space-between"} mb={4}>
+                                    <HStack spacing={3}>
+                                        <Avatar 
+                                            src={userProfile.profilePicURL} 
+                                            size="sm"
+                                            border="2px solid"
+                                            borderColor="brand.500"
+                                        />
+                                        <Text fontWeight={"bold"} fontSize="sm" className="gradient-text">
+                                            {userProfile.username}
+                                        </Text>
+                                    </HStack>
 
                                     {authUser?.uid === userProfile.uid && (
-
                                         <Button
                                             size={"sm"}
-                                            bg={"transparent"}
-                                            _hover={{ bg: "whiteAlpha.300", color: "red.600" }}
-                                            borderRadius={4}
-                                            p={1}
-                                            onClick={handleDeletePost}>
-                                            <MdDelete size={20} cursor="pointer" />
+                                            variant="ghost"
+                                            color="red.400"
+                                            _hover={{ bg: "red.900" }}
+                                            borderRadius="lg"
+                                            onClick={handleDeletePost}
+                                            isLoading={isDeleting}
+                                        >
+                                            <MdDelete size={20} />
                                         </Button>
-
                                     )}
-
                                 </Flex>
 
-                                <Divider my={4} bg={"gray.500"} />
+                                <Divider my={2} bg={"whiteAlpha.200"} />
 
-                                <VStack w="full" alignItems={"start"} maxH={"350px"} overflowY={"auto"}>
-                                    {/* caption */}
+                                <VStack 
+                                    w="full" 
+                                    alignItems={"start"} 
+                                    maxH={"350px"} 
+                                    overflowY={"auto"}
+                                    spacing={4}
+                                >
                                     {post.caption && <Caption post={post} />}
-                                    {/* comment */}
                                     {post.comments.map((comment, idx) => (
                                         <Comment key={comment.id || idx} comment={comment} />
                                     ))}
-
-
-
                                 </VStack>
-                                <Divider my={4} bg={"gray.500"} />
 
+                                <Divider my={4} bg={"whiteAlpha.200"} />
                                 <PostFooter isProfilePage={"true"} post={post} />
-
-
-
                             </Flex>
                         </Flex>
                     </ModalBody>
                 </ModalContent>
             </Modal>
-
         </>
     )
 }

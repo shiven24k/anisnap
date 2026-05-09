@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Button, Input, VStack } from "@chakra-ui/react"
+import { Alert, AlertIcon, Button, Input, VStack, FormControl, FormLabel } from "@chakra-ui/react"
 import { useState } from "react"
 import useLogin from "../../hooks/useLogin"
 
@@ -10,59 +10,64 @@ const Login = () => {
     const { loading, error, login } = useLogin()
 
     return (
-        <VStack spacing={4} w="full">
-            <Input
-                placeholder="Email"
-                fontSize={14}
-                type="email"
-                value={inputs.email}
-                size={"md"}
-                variant="filled"
-                bg="whiteAlpha.200"
-                color="white"
-                borderColor="whiteAlpha.300"
-                _hover={{ bg: "whiteAlpha.300" }}
-                _placeholder={{ color: "whiteAlpha.600" }}
-                onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
-            />
-            <Input
-                placeholder="Password"
-                fontSize={14}
-                type="password"
-                value={inputs.password}
-                size={"md"}
-                variant="filled"
-                bg="whiteAlpha.200"
-                color="white"
-                borderColor="whiteAlpha.300"
-                _hover={{ bg: "whiteAlpha.300" }}
-                _placeholder={{ color: "whiteAlpha.600" }}
-                onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
-            />
+        <VStack spacing={5} w="full">
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Email</FormLabel>
+                <Input
+                    placeholder="your@email.com"
+                    fontSize={14}
+                    type="email"
+                    value={inputs.email}
+                    size={"md"}
+                    variant="anime"
+                    _placeholder={{ color: "whiteAlpha.400" }}
+                    onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+                />
+            </FormControl>
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Password</FormLabel>
+                <Input
+                    placeholder="Enter your password"
+                    fontSize={14}
+                    type="password"
+                    value={inputs.password}
+                    size={"md"}
+                    variant="anime"
+                    _placeholder={{ color: "whiteAlpha.400" }}
+                    onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+                />
+            </FormControl>
             {error && (
-                <Alert 
-                    status="error" 
-                    fontSize={13} 
-                    p={2} 
-                    borderRadius={4}
-                    bg="red.700"
-                    color="white"
+                <Alert
+                    status="error"
+                    fontSize={13}
+                    p={3}
+                    borderRadius="lg"
+                    bg="rgba(229, 62, 62, 0.2)"
+                    border="1px solid"
+                    borderColor="red.500"
+                    color="red.300"
                 >
-                    <AlertIcon fontSize={12} color="white"/>
+                    <AlertIcon fontSize={12} />
                     {error.message}
                 </Alert>
             )}
-            <Button 
-                w={"full"} 
-                size={"md"} 
-                fontSize={14} 
-                isLoading={loading} 
+            <Button
+                isLoading={loading}
                 onClick={() => login(inputs)}
-                bg="red.500"
+                bg="#E53935"
                 color="white"
-                _hover={{ bg: "red.600" }}
+                fontSize="lg"
+                fontWeight="bold"
+                fontStyle="italic"
+                px={6}
+                py={3}
+                borderRadius="4px"
+                transition="all 0.3s"
+                w="full"
+
             >
-                Log in 
+                Welcome Back
             </Button>
         </VStack>
     )

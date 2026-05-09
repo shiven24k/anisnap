@@ -6,7 +6,9 @@ import {
     Input, 
     InputGroup, 
     InputRightElement, 
-    VStack 
+    VStack,
+    FormControl,
+    FormLabel 
 } from "@chakra-ui/react"
 import { useState } from "react"
 import useSignUpWithEmailAndPassword from "../../hooks/useSignUpWithEmailAndPassword"
@@ -23,86 +25,84 @@ const Signup = () => {
 
     return (
         <VStack spacing={4} w="full">
-            <Input
-                placeholder="Email"
-                fontSize={14}
-                type="email"
-                value={inputs.email}
-                size={"md"}
-                variant="filled"
-                bg="whiteAlpha.200"
-                color="white"
-                borderColor="whiteAlpha.300"
-                _hover={{ bg: "whiteAlpha.300" }}
-                _placeholder={{ color: "whiteAlpha.600" }}
-                onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
-            />
-            <Input
-                placeholder="Username"
-                fontSize={14}
-                type="text"
-                value={inputs.username}
-                size={"md"}
-                variant="filled"
-                bg="whiteAlpha.200"
-                color="white"
-                borderColor="whiteAlpha.300"
-                _hover={{ bg: "whiteAlpha.300" }}
-                _placeholder={{ color: "whiteAlpha.600" }}
-                onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
-            />
-            <Input
-                placeholder="Full Name"
-                fontSize={14}
-                type="text"
-                value={inputs.fullname}
-                size={"md"}
-                variant="filled"
-                bg="whiteAlpha.200"
-                color="white"
-                borderColor="whiteAlpha.300"
-                _hover={{ bg: "whiteAlpha.300" }}
-                _placeholder={{ color: "whiteAlpha.600" }}
-                onChange={(e) => setInputs({ ...inputs, fullname: e.target.value })}
-            />
-            <InputGroup>
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Email</FormLabel>
                 <Input
-                    placeholder="Password"
+                    placeholder="your@email.com"
                     fontSize={14}
-                    type={showPassword ? "text" : "password"}
-                    value={inputs.password}
+                    type="email"
+                    value={inputs.email}
                     size={"md"}
-                    variant="filled"
-                    bg="whiteAlpha.200"
-                    color="white"
-                    borderColor="whiteAlpha.300"
-                    _hover={{ bg: "whiteAlpha.300" }}
-                    _placeholder={{ color: "whiteAlpha.600" }}
-                    onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+                    variant="anime"
+                    _placeholder={{ color: "whiteAlpha.400" }}
+                    onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
                 />
-
-                <InputRightElement h="full">
-                    <Button 
-                        variant={"ghost"} 
-                        size={"sm"} 
-                        color="white"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                    </Button>
-                </InputRightElement>
-            </InputGroup>
+            </FormControl>
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Username</FormLabel>
+                <Input
+                    placeholder="anime_lover"
+                    fontSize={14}
+                    type="text"
+                    value={inputs.username}
+                    size={"md"}
+                    variant="anime"
+                    _placeholder={{ color: "whiteAlpha.400" }}
+                    onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
+                />
+            </FormControl>
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Full Name</FormLabel>
+                <Input
+                    placeholder="Your Name"
+                    fontSize={14}
+                    type="text"
+                    value={inputs.fullname}
+                    size={"md"}
+                    variant="anime"
+                    _placeholder={{ color: "whiteAlpha.400" }}
+                    onChange={(e) => setInputs({ ...inputs, fullname: e.target.value })}
+                />
+            </FormControl>
+            <FormControl>
+                <FormLabel fontSize="sm" color="whiteAlpha.700">Password</FormLabel>
+                <InputGroup>
+                    <Input
+                        placeholder="Create a password"
+                        fontSize={14}
+                        type={showPassword ? "text" : "password"}
+                        value={inputs.password}
+                        size={"md"}
+                        variant="anime"
+                        _placeholder={{ color: "whiteAlpha.400" }}
+                        onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+                    />
+                    <InputRightElement h="full">
+                        <Button 
+                            variant={"ghost"} 
+                            size={"sm"} 
+                            color="whiteAlpha.600"
+                            _hover={{ color: "white" }}
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                        </Button>
+                    </InputRightElement>
+                </InputGroup>
+            </FormControl>
 
             {error && (
                 <Alert 
                     status="error" 
                     fontSize={13} 
-                    p={2} 
-                    borderRadius={4}
-                    bg="red.700"
-                    color="white"
+                    p={3} 
+                    borderRadius="lg"
+                    bg="rgba(229, 62, 62, 0.2)"
+                    border="1px solid"
+                    borderColor="red.500"
+                    color="red.300"
                 >
-                    <AlertIcon fontSize={12} color="white"/>
+                    <AlertIcon fontSize={12} />
                     {error.message}
                 </Alert>
             )}
@@ -112,12 +112,11 @@ const Signup = () => {
                 size={"md"} 
                 fontSize={14} 
                 isLoading={loading}
-                bg="red.500"
-                color="white"
-                _hover={{ bg: "red.600" }}
+                variant="gradient"
+                h="44px"
                 onClick={() => signup(inputs)}
             >
-                Sign Up
+                Join AniSnap
             </Button>
         </VStack>
     )
