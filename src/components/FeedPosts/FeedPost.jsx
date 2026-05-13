@@ -117,12 +117,11 @@ const FeedPost = ({post}) => {
       {/* Image with Like Overlay */}
       <Box position="relative" overflow="hidden">
         <Image 
-          src={post.imageURL} 
-          alt="Feed Post" 
-          objectFit="cover" 
-          w="100%" 
+          src={post.imageURL}
+          alt="Feed Post"
+          objectFit="cover"
+          w="100%"
           h="auto"
-          maxH="500px"
           transition="transform 0.4s"
           _hover={{ transform: 'scale(1.02)' }}
           cursor="pointer"

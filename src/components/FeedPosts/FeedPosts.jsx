@@ -1,11 +1,9 @@
-import { 
-  Box, 
-  Spinner, 
-  Text, 
+import {
+  Box,
+  Spinner,
+  Text,
   Flex,
   useColorModeValue,
-  Grid,
-  SimpleGrid
 } from '@chakra-ui/react'
 import FeedPost from './FeedPost'
 import useGetFeedPosts from '../../hooks/useGetFeedPosts'
@@ -25,20 +23,20 @@ const FeedPosts = () => {
 
   if (!posts.length) {
     return (
-      <Flex 
-        direction="column" 
-        align="center" 
-        justify="center" 
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
         h="50vh"
         bg={useColorModeValue('white', '#1A1A2E')}
         borderRadius="2xl"
         border="1px solid"
         borderColor={useColorModeValue('gray.100', 'whiteAlpha.100')}
       >
-        <Box 
-          w={20} 
-          h={20} 
-          borderRadius="full" 
+        <Box
+          w={20}
+          h={20}
+          borderRadius="full"
           bgGradient="linear(to-br, #E53935, #FF6F61)"
           display="flex"
           alignItems="center"
@@ -56,22 +54,26 @@ const FeedPosts = () => {
   }
 
   return (
-    <Box>
-      {/* Unique Grid Layout - Alternating sizes */}
-      <Grid 
-        templateColumns={{base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)"}}
-        gap={4}
-      >
-        {posts.map((post, index) => (
-          <Box
-            key={post.id}
-            gridColumn={index % 5 === 0 ? {base: "1", md: "span 2"} : "span 1"}
-            gridRow={index % 5 === 0 ? {base: "auto", md: "span 2"} : "span 1"}
-          >
-            <FeedPost post={post} />
-          </Box>
-        ))}
-      </Grid>
+    <Box
+      sx={{
+        columnCount: [1, 1, 2, 3],
+        columnGap: '16px',
+      }}
+    >
+      {posts.map((post) => (
+        <Box
+          key={post.id}
+          sx={{
+            breakInside: 'avoid',
+            pageBreakInside: 'avoid',
+            display: 'inline-block',
+            width: '100%',
+            marginBottom: '16px',
+          }}
+        >
+          <FeedPost post={post} />
+        </Box>
+      ))}
     </Box>
   )
 }
