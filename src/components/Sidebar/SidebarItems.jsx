@@ -1,69 +1,76 @@
-import { Box, Flex, Link, Tooltip, Avatar, useColorModeValue } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
-import { AiFillHome } from "react-icons/ai";
-import { SearchLogo, NotificationsLogo, CreatePostLogo } from "../../assets/constants";
-import useAuthStore from "../../store/authStore";
-import ThemeSwitcher from "./ThemeSwitcher";
+import { Avatar, Box, Flex, Link, Tooltip, useColorModeValue, useDisclosure } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
+import { FiHome, FiSearch } from "react-icons/fi"
+import { NotificationsLogo } from "../../assets/constants"
+import useAuthStore from "../../store/authStore"
+import useUIStore from "../../store/uiStore"
+import ThemeSwitcher from "./ThemeSwitcher"
+import CreatePost from "./CreatePost"
+import SearchDrawer from "./SearchDrawer"
 
-const SidebarItem = ({ icon, label, to, onClick, isAvatar, avatarSrc }) => {
+// Shared hook — returns common item sizing props based on sidebar state
+const useItemLayout = () => {
+  const { leftSidebarOpen } = useUIStore()
+  return {
+    isExpanded: leftSidebarOpen,
+    w: leftSidebarOpen ? { base: 12, md: "full" } : 12,
+    justify: leftSidebarOpen ? { base: "center", md: "flex-start" } : "center",
+    showLabel: leftSidebarOpen,
+    // tooltip: show always when collapsed, only mobile when expanded
+    tooltipDisplay: leftSidebarOpen ? { base: "block", md: "none" } : "block",
+  }
+}
+
+const NavItem = ({ icon, label, to, onClick }) => {
   const hoverBg = useColorModeValue('gray.100', 'whiteAlpha.100')
   const iconBg = useColorModeValue('gray.100', 'whiteAlpha.100')
   const textColor = useColorModeValue('#1A1A2E', 'white')
+  const { w, justify, showLabel, tooltipDisplay } = useItemLayout()
 
-  const content = (
+  const inner = (
     <Flex
-      alignItems={"center"}
+      alignItems="center"
       gap={3}
-      _hover={{ bg: hoverBg, color: '#E53935' }}
-      borderRadius={12}
+      _hover={{ bg: hoverBg }}
+      borderRadius="xl"
       p={3}
-      w={{ base: 12, md: "full" }}
-      justifyContent={{ base: "center", md: "flex-start" }}
-      transition="all 0.3s"
+      w={w}
+      justifyContent={justify}
+      transition="all 0.2s"
       cursor="pointer"
       color={textColor}
       onClick={onClick}
     >
-      <Box p={2} borderRadius="lg" bg={iconBg}>
+      <Box p={2} borderRadius="lg" bg={iconBg} flexShrink={0} lineHeight={0}>
         {icon}
       </Box>
-      <Box display={{ base: "none", md: "block" }} fontWeight="medium" color={textColor}>
+      <Box
+        display={showLabel ? { base: "none", md: "block" } : "none"}
+        fontWeight="medium"
+        fontSize="sm"
+        color={textColor}
+        whiteSpace="nowrap"
+        overflow="hidden"
+      >
         {label}
       </Box>
     </Flex>
   )
 
-  if (to) {
-    return (
-      <Tooltip hasArrow label={label} placement='right' ml={1} openDelay={500} display={{ base: "block", md: "none" }} bg="red.600">
-        <Link as={RouterLink} to={to} w="full">
-          {content}
-        </Link>
-      </Tooltip>
-    )
-  }
-
   return (
-    <Tooltip hasArrow label={label} placement='right' ml={1} openDelay={500} display={{ base: "block", md: "none" }} bg="red.600">
-      {content}
-    </Tooltip>
-  )
-}
-
-const HomeItem = () => {
-  const hoverBg = useColorModeValue('gray.100', 'whiteAlpha.100')
-  const textColor = useColorModeValue('#1A1A2E', 'white')
-  
-  return (
-    <Tooltip hasArrow label={"Home"} placement='right' ml={1} openDelay={500} display={{ base: "block", md: "none" }} bg="red.600">
-      <Link as={RouterLink} to="/" w="full">
-        <Flex alignItems={"center"} gap={3} _hover={{ bg: hoverBg, color: '#E53935' }} borderRadius={12} p={3} w={{ base: 12, md: "full" }} justifyContent={{ base: "center", md: "flex-start" }} transition="all 0.3s" color={textColor}>
-          <Box p={2} borderRadius="lg" bg={useColorModeValue('gray.100', 'whiteAlpha.100')}>
-            <AiFillHome size={22} color={textColor} />
-          </Box>
-          <Box display={{ base: "none", md: "block" }} fontWeight="medium" color={textColor}>Home</Box>
-        </Flex>
-      </Link>
+    <Tooltip
+      hasArrow
+      label={label}
+      placement="right"
+      openDelay={500}
+      bg="gray.800"
+      color="white"
+      display={tooltipDisplay}
+    >
+      {to
+        ? <Link as={RouterLink} to={to} w="full" _hover={{ textDecoration: "none" }}>{inner}</Link>
+        : inner
+      }
     </Tooltip>
   )
 }
@@ -72,13 +79,47 @@ const ProfileLink = () => {
   const authUser = useAuthStore((state) => state.user)
   const hoverBg = useColorModeValue('gray.100', 'whiteAlpha.100')
   const textColor = useColorModeValue('#1A1A2E', 'white')
+  const { w, justify, showLabel, tooltipDisplay } = useItemLayout()
 
   return (
-    <Tooltip hasArrow label={"Profile"} placement='right' ml={1} openDelay={500} display={{ base: "block", md: "none" }} bg="red.600">
-      <Link as={RouterLink} to={`/${authUser?.username}`} w="full">
-        <Flex alignItems={"center"} gap={3} _hover={{ bg: hoverBg, color: '#E53935' }} borderRadius={12} p={3} w={{ base: 12, md: "full" }} justifyContent={{ base: "center", md: "flex-start" }} transition="all 0.3s" color={textColor}>
-          <Avatar size="sm" src={authUser?.profilePicURL || ""} border="2px solid" borderColor="#E53935" />
-          <Box display={{ base: "none", md: "block" }} fontWeight="medium" color={textColor}>Profile</Box>
+    <Tooltip
+      hasArrow
+      label="Profile"
+      placement="right"
+      openDelay={500}
+      bg="gray.800"
+      color="white"
+      display={tooltipDisplay}
+    >
+      <Link as={RouterLink} to={`/${authUser?.username}`} w="full" _hover={{ textDecoration: "none" }}>
+        <Flex
+          alignItems="center"
+          gap={3}
+          _hover={{ bg: hoverBg }}
+          borderRadius="xl"
+          p={3}
+          w={w}
+          justifyContent={justify}
+          transition="all 0.2s"
+          cursor="pointer"
+          color={textColor}
+        >
+          <Avatar
+            size="sm"
+            src={authUser?.profilePicURL || ""}
+            border="2px solid"
+            borderColor="#E53935"
+            flexShrink={0}
+          />
+          <Box
+            display={showLabel ? { base: "none", md: "block" } : "none"}
+            fontWeight="medium"
+            fontSize="sm"
+            color={textColor}
+            whiteSpace="nowrap"
+          >
+            Profile
+          </Box>
         </Flex>
       </Link>
     </Tooltip>
@@ -86,16 +127,19 @@ const ProfileLink = () => {
 }
 
 const SidebarItems = () => {
+  const { isOpen: isSearchOpen, onOpen: onSearchOpen, onClose: onSearchClose } = useDisclosure()
+
   return (
     <>
-      <HomeItem />
-      <SidebarItem icon={<SearchLogo />} label="Search" />
-      <SidebarItem icon={<NotificationsLogo />} label="Notifications" />
-      <SidebarItem icon={<CreatePostLogo />} label="Create" onClick={() => {}} />
+      <NavItem icon={<FiHome size={20} color="#E53935" />} label="Home" to="/" />
+      <NavItem icon={<FiSearch size={20} color="#E53935" />} label="Search" onClick={onSearchOpen} />
+      <NavItem icon={<NotificationsLogo />} label="Notifications" />
+      <CreatePost />
       <ProfileLink />
       <ThemeSwitcher />
+      <SearchDrawer isOpen={isSearchOpen} onClose={onSearchClose} />
     </>
-  );
-};
+  )
+}
 
-export default SidebarItems;
+export default SidebarItems

@@ -12,7 +12,7 @@ const ProfilePage = () => {
   const { isLoading: postsLoading, posts } = useGetUserPosts()
   
   const bgColor = useColorModeValue('#F5F5F5', '#0A0A12')
-  const cardBg = useColorModeValue('white', 'rgba(255,255,255,0.05)')
+  const cardBg = useColorModeValue('white', '#1A1A2E')
   const textColor = useColorModeValue('#1A1A2E', 'white')
   const subTextColor = useColorModeValue('gray.600', 'whiteAlpha.600')
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100')
@@ -32,13 +32,13 @@ const ProfilePage = () => {
           <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4} px={2}>Posts</Text>
           
           {postsLoading ? (
-            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={2}>
+            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={3}>
               {[0,1,2,3,4,5].map((i) => (
-                <Skeleton key={i} h="200px" borderRadius="lg" />
+                <Skeleton key={i} h="200px" borderRadius="xl" />
               ))}
             </Grid>
           ) : posts.length > 0 ? (
-            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={2}>
+            <Grid templateColumns={{base: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}} gap={3}>
               {posts.map((post) => (
                 <ProfilePost key={post.id} post={post} />
               ))}
