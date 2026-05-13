@@ -9,9 +9,11 @@ import FeedPost from './FeedPost'
 import useGetFeedPosts from '../../hooks/useGetFeedPosts'
 
 const FeedPosts = () => {
-  const {isLoading, posts} = useGetFeedPosts();
+  const { isLoading, posts } = useGetFeedPosts();
   const subTextColor = useColorModeValue('gray.500', 'gray.400')
   const textColor = useColorModeValue('#1A1A2E', 'white')
+  const emptyBg = useColorModeValue('white', '#1A1A2E')
+  const emptyBorder = useColorModeValue('gray.100', 'whiteAlpha.100')
 
   if (isLoading) {
     return (
@@ -28,10 +30,10 @@ const FeedPosts = () => {
         align="center"
         justify="center"
         h="50vh"
-        bg={useColorModeValue('white', '#1A1A2E')}
+        bg={emptyBg}
         borderRadius="2xl"
         border="1px solid"
-        borderColor={useColorModeValue('gray.100', 'whiteAlpha.100')}
+        borderColor={emptyBorder}
       >
         <Box
           w={20}
@@ -56,8 +58,10 @@ const FeedPosts = () => {
   return (
     <Box
       sx={{
-        columnCount: { base: 1, sm: 2, xl: 3 },
-        columnGap: '12px',
+        // columnWidth lets the browser fit as many columns as possible
+        // at ~260px each — automatically gains columns as sidebars collapse
+        columnWidth: '260px',
+        columnGap: '10px',
       }}
     >
       {posts.map((post) => (
@@ -68,7 +72,7 @@ const FeedPosts = () => {
             pageBreakInside: 'avoid',
             display: 'inline-block',
             width: '100%',
-            marginBottom: '12px',
+            marginBottom: '10px',
           }}
         >
           <FeedPost post={post} />
