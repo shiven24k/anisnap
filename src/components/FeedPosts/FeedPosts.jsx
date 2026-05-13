@@ -56,8 +56,8 @@ const FeedPosts = () => {
   return (
     <Box
       sx={{
-        columnCount: [1, 1, 2, 3],
-        columnGap: '16px',
+        columnCount: { base: 1, sm: 2, xl: 3 },
+        columnGap: '12px',
       }}
     >
       {posts.map((post) => (
@@ -68,7 +68,7 @@ const FeedPosts = () => {
             pageBreakInside: 'avoid',
             display: 'inline-block',
             width: '100%',
-            marginBottom: '16px',
+            marginBottom: '12px',
           }}
         >
           <FeedPost post={post} />
